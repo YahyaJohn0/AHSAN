@@ -1,0 +1,564 @@
+{
+  "adminAuth": {
+    "username": "admin",
+    "passwordHash": "41e5653fc7aeb894026d6bb7b2db7f65902b454945fa8fd65a6327047b5277fb",
+    "tokenSecret": "eaad08465a95779f0a13a3eb82e398a8a0c69da75e1d9ea49528685ab2cf07b1"
+  },
+  "settings": {
+    "storeName": "Zamzam",
+    "tagline": "Refined Everyday Beauty, Hair & Home Essentials",
+    "contactPhone": "03049002888",
+    "contactEmail": "ahsanullahyousafzai90@gmail.com",
+    "address": "Zamzam Lifestyle Studio, Commercial Zone, Phase 5 DHA, Lahore, Pakistan",
+    "currency": "PKR",
+    "standardShippingFee": 200,
+    "freeShippingThreshold": 3000,
+    "returnPolicy": "7-day hassle-free replacement or return on undamaged personal accessories and cosmetic organizers. Unused hygiene items with seal intact.",
+    "deliveryPolicy": "Fast nationwide Cash on Delivery (COD). Orders in Lahore/Karachi/Islamabad delivered within 2-3 business days. All other cities 3-5 business days.",
+    "aboutText": "Zamzam curates salon-grade hair care brushes, high-precision personal grooming tools, and elegant cosmetic storage designed for modern everyday living."
+  },
+  "categories": [
+    {
+      "id": "cat-hair",
+      "name": "Hairbrushes & Styling",
+      "slug": "hairbrushes-styling",
+      "description": "Ergonomic paddle brushes, thermal round blow-dry brushes, and scalp stimulators",
+      "image": "/src/assets/images/product_rosegold_brush_1792058412656.jpg",
+      "displayOrder": 1,
+      "isActive": true
+    },
+    {
+      "id": "cat-organizers",
+      "name": "Cosmetic & Vanity Organizers",
+      "slug": "cosmetic-organizers",
+      "description": "360 rotating caddies, acrylic makeup drawers, and aesthetic vanity storage",
+      "image": "/src/assets/images/product_makeup_organizer_1792058414597.jpg",
+      "displayOrder": 2,
+      "isActive": true
+    },
+    {
+      "id": "cat-beauty",
+      "name": "Beauty Tools & Accessories",
+      "slug": "beauty-tools",
+      "description": "French hair clips, claw clamps, facial rollers, and grooming essentials",
+      "image": "/src/assets/images/hero_lifestyle_store_1792058412869.jpg",
+      "displayOrder": 3,
+      "isActive": true
+    },
+    {
+      "id": "cat-household",
+      "name": "Household & Home Storage",
+      "slug": "household-storage",
+      "description": "Drawer dividers, kitchen spice racks, and aesthetic home organizers",
+      "image": "/src/assets/images/product_wood_paddle_brush_1792058413065.jpg",
+      "displayOrder": 4,
+      "isActive": true
+    }
+  ],
+  "banners": [
+    {
+      "id": "ban-1",
+      "title": "Salon-Grade Styling At Home",
+      "subtitle": "Discover our signature rose gold thermal brushes & acrylic organizers.",
+      "badgeText": "New Collection",
+      "imageUrl": "/src/assets/images/hero_lifestyle_store_1792058412869.jpg",
+      "linkUrl": "#collection",
+      "ctaText": "Explore Now",
+      "isActive": true,
+      "displayOrder": 1
+    }
+  ],
+  "coupons": [
+    {
+      "id": "cpn-1",
+      "code": "WELCOME10",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "minSpend": 1500,
+      "maxDiscount": 500,
+      "usageLimit": 500,
+      "timesUsed": 13,
+      "isActive": true
+    },
+    {
+      "id": "cpn-2",
+      "code": "AURA500",
+      "discountType": "fixed",
+      "discountValue": 500,
+      "minSpend": 3500,
+      "usageLimit": 200,
+      "timesUsed": 6,
+      "isActive": true
+    },
+    {
+      "id": "cpn-3",
+      "code": "FREESHIP",
+      "discountType": "fixed",
+      "discountValue": 200,
+      "minSpend": 2000,
+      "usageLimit": 300,
+      "timesUsed": 19,
+      "isActive": true
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-1",
+      "name": "Rose Gold Pro Thermal Styling Brush",
+      "sku": "AURA-BR-RG01",
+      "description": "Professional salon-grade round blow-dry brush featuring ionic ceramic barrel, heat-resistant nylon ball bristles, and ergonomic metallic rose gold handle for silky voluminous blowouts.",
+      "shortDescription": "Ionic thermal round brush for salon blowouts",
+      "categoryId": "cat-hair",
+      "price": 1550,
+      "salePrice": 1290,
+      "stock": 42,
+      "images": [
+        "/src/assets/images/product_rosegold_brush_1792058412656.jpg",
+        "/src/assets/images/hero_lifestyle_store_1792058412869.jpg"
+      ],
+      "isFeatured": true,
+      "isBestSeller": true,
+      "isTrending": true,
+      "isNewArrival": false,
+      "isActive": true,
+      "createdAt": "2026-10-05T10:22:02.670Z",
+      "updatedAt": "2026-10-16T02:48:53.338Z"
+    },
+    {
+      "id": "prod-2",
+      "name": "Ergonomic Natural Wood Grain Cushion Paddle Brush",
+      "sku": "AURA-BR-WD02",
+      "description": "Handcrafted natural wood grain finish with flexible air-cushioned rubber pad and smooth anti-static ball-tipped pins. Gently detangles wet and dry hair while massaging scalp circulation.",
+      "shortDescription": "Air-cushioned wooden paddle brush for effortless detangling",
+      "categoryId": "cat-hair",
+      "price": 1750,
+      "salePrice": 1450,
+      "stock": 35,
+      "images": [
+        "/src/assets/images/product_wood_paddle_brush_1792058413065.jpg"
+      ],
+      "isFeatured": true,
+      "isBestSeller": true,
+      "isTrending": false,
+      "isNewArrival": true,
+      "isActive": true,
+      "createdAt": "2026-10-07T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-3",
+      "name": "Chameleon Aurora Iridescent Paddle Brush",
+      "sku": "AURA-BR-IR03",
+      "description": "Vibrant metallic chameleon chrome finish with violet-to-gold chromatic shifts. Soft flexible pink bristles glide through dense or curly hair without pulling or breakage.",
+      "shortDescription": "Vibrant iridescent chrome paddle brush",
+      "categoryId": "cat-hair",
+      "price": 1390,
+      "salePrice": 1090,
+      "stock": 58,
+      "images": [
+        "/src/assets/images/product_rainbow_hairbrush_1792058414278.jpg"
+      ],
+      "isFeatured": true,
+      "isBestSeller": false,
+      "isTrending": true,
+      "isNewArrival": true,
+      "isActive": true,
+      "createdAt": "2026-10-10T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-4",
+      "name": "Aesthetic Multi-Tier Cosmetic Vanity Organizer",
+      "sku": "AURA-ORG-MK04",
+      "description": "Heavy-duty crystal-clear acrylic vanity storage box with 6 brush compartments, pull-out jewelry drawers, and top lipstick tiers. Keeps dressing tables clutter-free and pristine.",
+      "shortDescription": "Multi-compartment acrylic makeup caddy with drawers",
+      "categoryId": "cat-organizers",
+      "price": 2950,
+      "salePrice": 2490,
+      "stock": 22,
+      "images": [
+        "/src/assets/images/product_makeup_organizer_1792058414597.jpg"
+      ],
+      "isFeatured": true,
+      "isBestSeller": true,
+      "isTrending": true,
+      "isNewArrival": false,
+      "isActive": true,
+      "createdAt": "2026-09-30T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-5",
+      "name": "Matte Black & Rose Gold Neck Oval Cushion Brush",
+      "sku": "AURA-BR-BL05",
+      "description": "Sleek matte rubberized black chassis with polished rose gold accent collar. Perfect compact daily brush for purse, gym bag, and smooth mid-day touch-ups.",
+      "shortDescription": "Velvet-touch black & rose gold compact cushion brush",
+      "categoryId": "cat-hair",
+      "price": 1250,
+      "salePrice": 990,
+      "stock": 65,
+      "images": [
+        "/src/assets/images/product_rosegold_brush_1792058412656.jpg"
+      ],
+      "isFeatured": false,
+      "isBestSeller": true,
+      "isTrending": false,
+      "isNewArrival": false,
+      "isActive": true,
+      "createdAt": "2026-10-03T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-6",
+      "name": "Aurora Metallic Spiral Blowout Barrel Brush",
+      "sku": "AURA-BR-SP06",
+      "description": "Vibrant rainbow chrome thermal barrel with staggered spiral bristles for maximum grip and tension when styling curls, waves, or root volume.",
+      "shortDescription": "Rainbow metallic round brush for bouncy curls and volume",
+      "categoryId": "cat-hair",
+      "price": 1450,
+      "salePrice": 1190,
+      "stock": 40,
+      "images": [
+        "/src/assets/images/product_rainbow_hairbrush_1792058414278.jpg"
+      ],
+      "isFeatured": false,
+      "isBestSeller": false,
+      "isTrending": true,
+      "isNewArrival": true,
+      "isActive": true,
+      "createdAt": "2026-10-12T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-7",
+      "name": "French Minimalist Amber & Gold Hair Claw Clips (4-Pack)",
+      "sku": "AURA-ACC-CL07",
+      "description": "Premium cellulose acetate non-slip claw clips with strong alloy spring mechanism. Holds thick, fine, or textured hair securely in half-up styles or chic French twists.",
+      "shortDescription": "Set of 4 matte & tortoise shell strong-hold hair clamps",
+      "categoryId": "cat-beauty",
+      "price": 890,
+      "salePrice": 690,
+      "stock": 85,
+      "images": [
+        "/src/assets/images/hero_lifestyle_store_1792058412869.jpg"
+      ],
+      "isFeatured": true,
+      "isBestSeller": true,
+      "isTrending": true,
+      "isNewArrival": false,
+      "isActive": true,
+      "createdAt": "2026-10-01T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    },
+    {
+      "id": "prod-8",
+      "name": "Modular Expandable Household Storage Organizers (6-Pack)",
+      "sku": "AURA-HH-OR08",
+      "description": "BPA-free durable modular organizing trays with non-skid rubber feet. Customizable layout for bathroom vanity, kitchen utensil drawers, or desk stationery.",
+      "shortDescription": "Clear modular storage bins with anti-slip silicone feet",
+      "categoryId": "cat-household",
+      "price": 1990,
+      "salePrice": 1650,
+      "stock": 28,
+      "images": [
+        "/src/assets/images/product_makeup_organizer_1792058414597.jpg"
+      ],
+      "isFeatured": false,
+      "isBestSeller": false,
+      "isTrending": false,
+      "isNewArrival": true,
+      "isActive": true,
+      "createdAt": "2026-10-11T10:22:02.670Z",
+      "updatedAt": "2026-10-15T10:22:02.670Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord-1792118933338-938",
+      "orderNumber": "ORD-CAXM5459",
+      "customer": {
+        "fullName": "Yahya Khan",
+        "phone": "03112234932",
+        "city": "Peshawar",
+        "area": "gcghfg",
+        "address": "LowerDir , sammerbagh"
+      },
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "Rose Gold Pro Thermal Styling Brush",
+          "price": 1290,
+          "quantity": 1,
+          "image": "/src/assets/images/product_rosegold_brush_1792058412656.jpg"
+        }
+      ],
+      "subtotal": 1290,
+      "discount": 0,
+      "shippingFee": 200,
+      "total": 1490,
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "fulfillmentStatus": "confirmed",
+      "statusHistory": [
+        {
+          "status": "placed",
+          "timestamp": "2026-10-16T02:48:53.338Z",
+          "note": "Order successfully placed via Guest Checkout"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2026-10-16T02:51:48.433Z"
+        }
+      ],
+      "createdAt": "2026-10-16T02:48:53.338Z",
+      "updatedAt": "2026-10-16T02:51:48.433Z",
+      "courierName": "TCS Express"
+    },
+    {
+      "id": "ord-1792060212015-458",
+      "orderNumber": "ORD-DP9R4133",
+      "customer": {
+        "fullName": "Ayesha Khan",
+        "phone": "03007654321",
+        "city": "Lahore",
+        "area": "Gulberg III",
+        "address": "House 88, Street 14, Main Boulevard"
+      },
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "Rose Gold Pro Thermal Styling Brush",
+          "price": 1290,
+          "quantity": 2,
+          "image": "/src/assets/images/product_rosegold_brush_1792058412656.jpg"
+        }
+      ],
+      "subtotal": 2580,
+      "discount": 258,
+      "shippingFee": 200,
+      "total": 2522,
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "fulfillmentStatus": "shipped",
+      "statusHistory": [
+        {
+          "status": "placed",
+          "timestamp": "2026-10-15T10:30:12.015Z",
+          "note": "Order successfully placed via Guest Checkout"
+        },
+        {
+          "status": "shipped",
+          "timestamp": "2026-10-15T10:37:41.029Z",
+          "note": "Tracking: TCS-88991244 (TCS Express)"
+        }
+      ],
+      "createdAt": "2026-10-15T10:30:12.015Z",
+      "updatedAt": "2026-10-15T10:37:41.029Z",
+      "trackingNumber": "TCS-88991244",
+      "courierName": "TCS Express"
+    },
+    {
+      "id": "ord-seed-1",
+      "orderNumber": "ORD-8821",
+      "customer": {
+        "fullName": "Fatima Tariq",
+        "phone": "03001234567",
+        "address": "House 42-B, Sector Z, Phase 3 DHA",
+        "city": "Lahore",
+        "area": "DHA",
+        "notes": "Please call before delivery"
+      },
+      "items": [
+        {
+          "productId": "prod-1",
+          "name": "Rose Gold Pro Thermal Styling Brush",
+          "price": 1290,
+          "quantity": 1,
+          "image": "/src/assets/images/product_rosegold_brush_1792058412656.jpg",
+          "sku": "AURA-BR-RG01"
+        },
+        {
+          "productId": "prod-7",
+          "name": "French Minimalist Amber & Gold Hair Claw Clips (4-Pack)",
+          "price": 690,
+          "quantity": 2,
+          "image": "/src/assets/images/hero_lifestyle_store_1792058412869.jpg",
+          "sku": "AURA-ACC-CL07"
+        }
+      ],
+      "subtotal": 2670,
+      "discount": 267,
+      "shippingFee": 200,
+      "total": 2603,
+      "paymentMethod": "COD",
+      "paymentStatus": "pending",
+      "fulfillmentStatus": "processing",
+      "statusHistory": [
+        {
+          "status": "placed",
+          "timestamp": "2026-10-13T10:22:02.670Z",
+          "note": "Order placed via Guest Checkout"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2026-10-13T15:10:02.670Z",
+          "note": "Confirmed with customer on WhatsApp"
+        },
+        {
+          "status": "processing",
+          "timestamp": "2026-10-14T10:22:02.670Z",
+          "note": "Sent to packing department"
+        }
+      ],
+      "trackingNumber": "TCS-89320147",
+      "courierName": "TCS Express",
+      "internalNotes": "Customer requested evening delivery after 4pm.",
+      "createdAt": "2026-10-13T10:22:02.670Z",
+      "updatedAt": "2026-10-14T10:22:02.670Z"
+    },
+    {
+      "id": "ord-seed-2",
+      "orderNumber": "ORD-9104",
+      "customer": {
+        "fullName": "Zainab Bilal",
+        "phone": "03219876543",
+        "address": "Apartment 502, Creek Vistas, Clifton",
+        "city": "Karachi",
+        "area": "Clifton"
+      },
+      "items": [
+        {
+          "productId": "prod-4",
+          "name": "Aesthetic Multi-Tier Cosmetic Vanity Organizer",
+          "price": 2490,
+          "quantity": 1,
+          "image": "/src/assets/images/product_makeup_organizer_1792058414597.jpg",
+          "sku": "AURA-ORG-MK04"
+        },
+        {
+          "productId": "prod-2",
+          "name": "Ergonomic Natural Wood Grain Cushion Paddle Brush",
+          "price": 1450,
+          "quantity": 1,
+          "image": "/src/assets/images/product_wood_paddle_brush_1792058413065.jpg",
+          "sku": "AURA-BR-WD02"
+        }
+      ],
+      "subtotal": 3940,
+      "discount": 500,
+      "shippingFee": 0,
+      "total": 3440,
+      "paymentMethod": "COD",
+      "paymentStatus": "paid",
+      "fulfillmentStatus": "delivered",
+      "statusHistory": [
+        {
+          "status": "placed",
+          "timestamp": "2026-10-10T10:22:02.670Z"
+        },
+        {
+          "status": "confirmed",
+          "timestamp": "2026-10-10T15:10:02.670Z"
+        },
+        {
+          "status": "shipped",
+          "timestamp": "2026-10-12T10:22:02.670Z"
+        },
+        {
+          "status": "delivered",
+          "timestamp": "2026-10-14T10:22:02.670Z",
+          "note": "Cash collected Rs. 3,440"
+        }
+      ],
+      "trackingNumber": "LEO-4491028",
+      "courierName": "Leopard Courier",
+      "createdAt": "2026-10-10T10:22:02.670Z",
+      "updatedAt": "2026-10-14T10:22:02.670Z"
+    }
+  ],
+  "inventoryMovements": [
+    {
+      "id": "inv-1792118933338-264",
+      "timestamp": "2026-10-16T02:48:53.338Z",
+      "productId": "prod-1",
+      "productName": "Rose Gold Pro Thermal Styling Brush",
+      "type": "order_deduction",
+      "quantityChange": -1,
+      "previousStock": 43,
+      "newStock": 42,
+      "reason": "Guest Checkout order placed",
+      "performedBy": "System"
+    },
+    {
+      "id": "inv-1792060212015-795",
+      "timestamp": "2026-10-15T10:30:12.015Z",
+      "productId": "prod-1",
+      "productName": "Rose Gold Pro Thermal Styling Brush",
+      "type": "order_deduction",
+      "quantityChange": -2,
+      "previousStock": 45,
+      "newStock": 43,
+      "reason": "Guest Checkout order placed",
+      "performedBy": "System"
+    },
+    {
+      "id": "inv-1",
+      "productId": "prod-1",
+      "productName": "Rose Gold Pro Thermal Styling Brush",
+      "type": "order_deduction",
+      "quantityChange": -1,
+      "previousStock": 46,
+      "newStock": 45,
+      "reason": "Order #ORD-8821 placed",
+      "timestamp": "2026-10-13T10:22:02.670Z",
+      "performedBy": "System (Checkout)"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "aud-1792119108433-570",
+      "timestamp": "2026-10-16T02:51:48.433Z",
+      "action": "Order Status Changed",
+      "entityType": "order",
+      "entityId": "ord-1792118933338-938",
+      "details": "Order #ORD-CAXM5459 changed from placed to confirmed",
+      "performedBy": "admin"
+    },
+    {
+      "id": "aud-1792118933338-895",
+      "timestamp": "2026-10-16T02:48:53.338Z",
+      "action": "Order Placed",
+      "entityType": "order",
+      "entityId": "ord-1792118933338-938",
+      "details": "New order #ORD-CAXM5459 for Rs. 1490 by Yahya Khan (03112234932)",
+      "performedBy": "guest"
+    },
+    {
+      "id": "aud-1792060661029-399",
+      "timestamp": "2026-10-15T10:37:41.029Z",
+      "action": "Order Status Changed",
+      "entityType": "order",
+      "entityId": "ord-1792060212015-458",
+      "details": "Order #ORD-DP9R4133 changed from placed to shipped",
+      "performedBy": "admin"
+    },
+    {
+      "id": "aud-1792060212015-385",
+      "timestamp": "2026-10-15T10:30:12.015Z",
+      "action": "Order Placed",
+      "entityType": "order",
+      "entityId": "ord-1792060212015-458",
+      "details": "New order #ORD-DP9R4133 for Rs. 2522 by Ayesha Khan (03007654321)",
+      "performedBy": "guest"
+    },
+    {
+      "id": "aud-1",
+      "action": "System Initialized",
+      "entityType": "settings",
+      "entityId": "aura-store",
+      "details": "Store catalog and settings loaded successfully",
+      "performedBy": "admin",
+      "timestamp": "2026-10-15T10:22:02.670Z"
+    }
+  ]
+}

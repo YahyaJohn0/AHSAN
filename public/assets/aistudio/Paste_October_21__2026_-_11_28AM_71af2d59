@@ -1,0 +1,804 @@
+# MASTER PROMPT — ZAMZAM E-COMMERCE ADMIN PANEL & BACKEND INTEGRATION
+
+## 1. Your Role
+
+Act as a senior full-stack engineer, backend architect, database engineer, security specialist, and UI/UX designer.
+
+You are working on my existing **Zamzam e-commerce project**. Inspect the current repository, understand its architecture, and implement the complete product and order management system. Do not merely generate a plan, mockup, or example code. Modify and integrate the actual application.
+
+Preserve all existing working features, design conventions, routes, components, environment configurations, and authentication flows unless a change is necessary for correctness or security.
+
+Do not replace functional features with mock data or demo behavior.
+
+## 2. Business Requirements
+
+Zamzam is an online store selling beauty, household, personal-care, and other consumer products.
+
+The customer storefront must support browsing and purchasing products without requiring customers to create accounts.
+
+The admin panel must support authenticated administrators who can:
+
+- View product statistics and store activity.
+- Add new products.
+- Upload product images to Cloudinary.
+- Edit existing products and prices.
+- Delete or archive products safely.
+- Manage inventory and stock.
+- Control featured, best-selling, trending, and new-arrival labels.
+- View and manage customer orders.
+- Update order statuses.
+- View customer shipping details.
+- Search, filter, and paginate products and orders.
+- Refresh data from the real backend.
+
+All product and order operations must persist in the real database.
+
+## 3. Existing Technology Stack
+
+First inspect the repository and identify the actual frameworks, package manager, backend, database adapter, and current authentication implementation.
+
+Expected technologies include:
+
+- React and TypeScript for the web frontend, if already used.
+- Existing Node.js backend and API routes, if present.
+- Firebase Authentication for administrator email/password login, if already configured.
+- Firebase Firestore for product and order data only if the project genuinely uses Firestore.
+- Cloudinary for product image storage and delivery.
+- Existing UI components and styling.
+
+Do not recreate the project from scratch if an existing implementation can be extended.
+
+Do not introduce a second backend, a second authentication system, or a duplicate product model without a justified compatibility reason.
+
+## 4. Database Provider Verification — Mandatory
+
+Inspect the existing `.env`, backend configuration, database libraries, connection code, and data models.
+
+The provided variable is:
+
+`FIRESTORE_URL=mongodb://ahsan:<PASSWORD>.asia-south2.firestore.goog:443/default?loadBalanced=true&tls=true&authMechanism=SCRAM-SHA-256&retryWrites=false`
+
+This is a MongoDB-compatible URI format, not a conventional Firebase Firestore SDK endpoint.
+
+Before implementing database operations:
+
+1. Determine whether the actual service is MongoDB-compatible or native Google Cloud Firestore.
+2. Inspect existing dependencies and connection logic.
+3. If it is a MongoDB-compatible service, use the supported MongoDB driver and a verified connection string.
+4. If it is native Firestore, use the Firebase Admin SDK on the backend with the correct project credentials.
+5. If the provider cannot be verified, report the precise missing configuration and implement the appropriate database adapter without pretending a connection succeeded.
+6. Never silently change database providers or migrate data without approval.
+
+Keep all privileged database operations on the backend.
+
+## 5. Environment Variables
+
+Use server-side environment variables for secrets and privileged operations.
+
+Expected configuration:
+
+```env
+PORT=8080
+NODE_ENV=development
+
+# Database: configure according to the verified provider.
+FIRESTORE_URL=
+GOOGLE_CLOUD_PROJECT_ID=
+GOOGLE_APPLICATION_CREDENTIALS=
+
+# Firebase authentication and verification.
+FIREBASE_PROJECT_ID=
+
+# Cloudinary.
+CLOUDINARY_CLOUD_NAME=dqtawjwph
+CLOUDINARY_UPLOAD_PRESET=zamzam
+CLOUDINARY_URL=
+CLOUDINARY_API_SECRET=
+
+# Admin authorization.
+ADMIN_UIDS=
+
+# Store configuration.
+COD_ENABLED=true
+DEFAULT_SHIPPING_FEE=0
+
+# Order tracking.
+ORDER_TRACKING_HMAC_SECRET=
+```
+
+These variables are alternatives or provider-specific settings where appropriate. Do not require every database variable simultaneously.
+
+Never print secret values in logs, commit them to source control, or expose them through frontend environment variables.
+
+Do not put `CLOUDINARY_API_SECRET`, service-account private keys, database credentials, or privileged tokens in browser code.
+
+Use a validated `.env.example` containing placeholder values only.
+
+If the project already has a valid configuration, preserve it and reuse the existing variable names.
+
+## 6. Seed the Initial 16 Products
+
+Import the following products into the actual product collection or database table.
+
+Preserve the supplied names, SKUs, descriptions, prices, stock quantities, category IDs, sale prices, flags, and image URLs.
+
+Use SKU as the stable business identifier for imports. Make repeated imports idempotent so they update matching products instead of creating duplicates.
+
+The 16 products are:
+
+```json
+[
+  {
+    "name": "Daily Moisture Face Cream",
+    "sku": "SEED-SK-001",
+    "description": "A daily-use face cream for adding a comfortable layer of moisture to your skincare routine.",
+    "shortDescription": "Everyday moisture for your skincare routine.",
+    "price": 1250,
+    "stock": 32,
+    "isFeatured": true,
+    "isBestSeller": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480787/samples/ecommerce/dpw5sew73tpzeq9egdio.webp"
+  },
+  {
+    "name": "Hydrating Face Cream",
+    "sku": "SEED-SK-002",
+    "description": "A moisturizing face cream made for daily skincare and a soft, comfortable feel.",
+    "shortDescription": "Daily hydration in a smooth cream.",
+    "price": 950,
+    "stock": 40,
+    "isTrending": true,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480781/samples/ecommerce/mpewlagslcbwsn10fmpj.jpg"
+  },
+  {
+    "name": "Nourishing Beauty Cream",
+    "sku": "SEED-SK-003",
+    "description": "A rich-feel beauty cream to add to your everyday face and skin care routine.",
+    "shortDescription": "A rich-feel cream for everyday care.",
+    "price": 1450,
+    "stock": 24,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480782/samples/ecommerce/uxqvwxavgiuqeyws1yd4.webp"
+  },
+  {
+    "name": "Lightweight Daily Moisturizer",
+    "sku": "SEED-SK-004",
+    "description": "A lightweight moisturizing cream for a simple, comfortable daily skincare routine.",
+    "shortDescription": "Lightweight moisture for daily use.",
+    "price": 650,
+    "stock": 50,
+    "isBestSeller": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480783/samples/ecommerce/fhghfc2uv9u846ai3xkb.webp"
+  },
+  {
+    "name": "Softening Face Cream",
+    "sku": "SEED-SK-005",
+    "description": "A softening face cream that fits easily into your morning or evening skincare routine.",
+    "shortDescription": "A soft-feel cream for daily skincare.",
+    "price": 2200,
+    "stock": 18,
+    "isFeatured": true,
+    "isTrending": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isBestSeller": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480784/samples/ecommerce/yhilxph3awd4h0lhwgbd.webp"
+  },
+  {
+    "name": "Rich Moisture Beauty Cream",
+    "sku": "SEED-SK-006",
+    "description": "A rich moisturizing cream for everyday beauty and personal care.",
+    "shortDescription": "Rich-feel moisture for everyday care.",
+    "price": 1850,
+    "stock": 20,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480785/samples/ecommerce/eyyd2mkd32rj29i3c84q.webp"
+  },
+  {
+    "name": "Everyday Skin Cream",
+    "sku": "SEED-SK-007",
+    "description": "An everyday beauty cream for adding a moisturizing step to your personal care routine.",
+    "shortDescription": "A simple moisturizing step for every day.",
+    "price": 550,
+    "stock": 45,
+    "isBestSeller": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480781/samples/ecommerce/tgkwnuhe6fwfgdra8v1r.jpg"
+  },
+  {
+    "name": "Comfort Moisturizing Cream",
+    "sku": "SEED-SK-008",
+    "description": "A moisturizing beauty cream with a comfortable feel for regular skincare use.",
+    "shortDescription": "Comfortable moisture for daily skincare.",
+    "price": 1100,
+    "stock": 27,
+    "isTrending": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480786/samples/ecommerce/t67yg9ghwcqoukggly2d.jpg"
+  },
+  {
+    "name": "Daily Care Face Moisturizer",
+    "sku": "SEED-SK-009",
+    "description": "A face moisturizer for daily use as part of a simple beauty care routine.",
+    "shortDescription": "An easy addition to your daily face care.",
+    "price": 1350,
+    "stock": 22,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480780/samples/ecommerce/rdnrworo7dywt9egoxle.jpg"
+  },
+  {
+    "name": "Classic Beauty Cream",
+    "sku": "SEED-SK-010",
+    "description": "A versatile beauty cream for everyday personal skincare and moisturizing.",
+    "shortDescription": "Everyday moisturizing for your beauty routine.",
+    "price": 1750,
+    "stock": 15,
+    "isFeatured": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480776/samples/ecommerce/wwhxiclt2uugr8rskjq1.webp"
+  },
+  {
+    "name": "Gentle Daily Face Cream",
+    "sku": "SEED-SK-011",
+    "description": "A daily face cream for a simple moisturizing step in your skincare routine.",
+    "shortDescription": "A simple daily moisturizing cream.",
+    "price": 1150,
+    "stock": 28,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480779/samples/ecommerce/t14w5kegighx29gwhy4u.jpg"
+  },
+  {
+    "name": "Smooth Touch Moisturizer",
+    "sku": "SEED-SK-012",
+    "description": "A smooth-texture moisturizer for everyday face and beauty care.",
+    "shortDescription": "A smooth cream for everyday care.",
+    "price": 900,
+    "stock": 36,
+    "isTrending": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480777/samples/ecommerce/dmecu1jyaaiulutwgnpu.webp"
+  },
+  {
+    "name": "Soft Finish Face Cream",
+    "sku": "SEED-SK-013",
+    "description": "A face cream with a soft finish for use in your regular skincare routine.",
+    "shortDescription": "A soft finish for your daily skincare.",
+    "price": 1050,
+    "stock": 30,
+    "isBestSeller": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isTrending": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480778/samples/ecommerce/nbyxa297pyot0hgdkqyz.webp"
+  },
+  {
+    "name": "Moisture Care Cream",
+    "sku": "SEED-SK-014",
+    "description": "A moisturizing cream for daily beauty care and a comfortable skin feel.",
+    "shortDescription": "Daily moisture for your beauty routine.",
+    "price": 1950,
+    "stock": 16,
+    "isFeatured": true,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480786/samples/ecommerce/lz6nzvhejrt14lke3vmn.jpg"
+  },
+  {
+    "name": "Premium Daily Face Cream",
+    "sku": "SEED-SK-015",
+    "description": "A premium-style face cream for everyday moisturizing and personal care.",
+    "shortDescription": "A daily moisturizing cream for face care.",
+    "price": 1550,
+    "stock": 21,
+    "isTrending": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isNewArrival": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480786/samples/ecommerce/lz6nzvhejrt14lke3vmn.jpg"
+  },
+  {
+    "name": "Beauty Cream for Daily Care",
+    "sku": "SEED-SK-016",
+    "description": "A beauty cream for adding a moisturizing step to your everyday care routine.",
+    "shortDescription": "Everyday moisturizing beauty care.",
+    "price": 1250,
+    "stock": 25,
+    "isNewArrival": true,
+    "categoryId": "cat-beauty",
+    "salePrice": null,
+    "isFeatured": false,
+    "isBestSeller": false,
+    "isTrending": false,
+    "isActive": true,
+    "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/v1792480788/samples/ecommerce/jbplmxgyqbweeyswmldv.png"
+  }
+]
+```
+
+Before importing, validate every image URL and retain it if it works. Do not re-upload the existing images merely to change their URLs.
+
+For the import:
+
+- Use `sku` as the unique key.
+- Use an upsert or transaction-aware equivalent.
+- Preserve existing product identifiers when updating existing records.
+- Do not delete unrelated products.
+- Check whether `cat-beauty` exists and create or map the category only according to the existing category model.
+- Generate a clear report of inserted, updated, skipped, and failed records.
+- Do not claim that seeding succeeded until the database confirms it.
+
+## 7. Cloudinary Integration
+
+Use this Cloudinary cloud:
+
+- Cloud name: `dqtawjwph`
+- Upload preset: `zamzam`
+- Preferred folder: `zamzam/products`
+- Existing seed-image folder: `samples/ecommerce`
+
+Implement an image upload workflow for the Add Product and Edit Product forms.
+
+Required behavior:
+
+1. Allow the administrator to select one or more product images.
+2. Validate file type, size, and upload limits.
+3. Show a preview before saving.
+4. Show upload progress and meaningful errors.
+5. Upload images to Cloudinary using a secure backend-generated signature or the existing verified secure upload mechanism.
+6. Receive the `secure_url` and `public_id`.
+7. Save the image URL and public ID with the product record.
+8. Support image replacement.
+9. Handle failed uploads and prevent partially saved product records.
+10. Use Cloudinary transformations for optimized thumbnails and storefront delivery.
+
+Store the image metadata in the database:
+
+```json
+{
+  "imageUrl": "https://res.cloudinary.com/dqtawjwph/image/upload/...",
+  "imagePublicId": "zamzam/products/example-image"
+}
+```
+
+For multiple images, use an array of objects with `imageUrl`, `publicId`, and optional `altText`.
+
+Do not trust a client-supplied Cloudinary URL or public ID without validation.
+
+When deleting or replacing images, only delete assets that belong to the authenticated store and are no longer referenced. Perform destructive Cloudinary operations on the trusted backend.
+
+Never expose `CLOUDINARY_API_SECRET` to the frontend.
+
+## 8. Backend API
+
+Extend the existing backend rather than creating conflicting endpoints.
+
+If the project already uses `/api/v1`, preserve that version prefix.
+
+Implement or adapt the following endpoints:
+
+### Product endpoints
+
+- `GET /api/v1/products` — list active products with pagination, search, and filters.
+- `GET /api/v1/products/:id` — retrieve a product.
+- `POST /api/v1/products` — create a product; admin only.
+- `PATCH /api/v1/products/:id` — update product details; admin only.
+- `DELETE /api/v1/products/:id` — archive a product by default; admin only.
+- `GET /api/v1/admin/products` — list all products, including inactive ones.
+- `POST /api/v1/admin/products/import` — import the initial catalog securely, with duplicate detection and a dry-run option.
+- `POST /api/v1/admin/uploads/signature` — generate a short-lived Cloudinary upload signature if signed uploads are used.
+
+### Category endpoints
+
+- `GET /api/v1/categories`
+- `POST /api/v1/categories` — admin only.
+- `PATCH /api/v1/categories/:id` — admin only.
+- `DELETE /api/v1/categories/:id` — admin only, with product-reference checks.
+
+### Order endpoints
+
+- `GET /api/v1/admin/orders` — paginated order list.
+- `GET /api/v1/admin/orders/:id` — full order details.
+- `PATCH /api/v1/admin/orders/:id/status` — update order status.
+- `PATCH /api/v1/admin/orders/:id` — update permitted order fields.
+- `POST /api/v1/orders` — create a customer order.
+- `GET /api/v1/orders/track/:trackingToken` — expose only the minimum information necessary for order tracking, with appropriate access controls.
+
+Use the existing route conventions if they differ. Validate inputs and return consistent JSON responses.
+
+## 9. Product Data Model
+
+Implement a consistent product model with:
+
+- `id`
+- `name`
+- `sku`
+- `description`
+- `shortDescription`
+- `price`
+- `salePrice`
+- `stock`
+- `categoryId`
+- `imageUrl`
+- `imagePublicId`
+- `images`
+- `isFeatured`
+- `isBestSeller`
+- `isTrending`
+- `isNewArrival`
+- `isActive`
+- `createdAt`
+- `updatedAt`
+
+Rules:
+
+- SKU must be unique.
+- Prices must be valid non-negative numbers.
+- Sale price must be null or a valid price below the regular price.
+- Stock must be a non-negative integer.
+- Category IDs must reference valid categories where applicable.
+- Missing Boolean flags default to false, except `isActive`, which defaults to true for newly created products.
+- Inactive products must not appear in the public storefront.
+- Do not hardcode product data into UI components.
+- Preserve backward compatibility with existing records and API responses.
+
+## 10. Admin Dashboard UI
+
+Use the existing design system. Build a polished, responsive administration interface that works on desktop, tablet, and mobile.
+
+### Dashboard overview
+
+Display live metrics:
+
+- Total products.
+- Active products.
+- Low-stock products.
+- Out-of-stock products.
+- Total orders.
+- Pending orders.
+- Processing orders.
+- Delivered orders.
+- Recent orders.
+- Recent product changes.
+
+Metrics must be calculated from real data and not hardcoded.
+
+### Product management page
+
+Provide:
+
+- Search by name or SKU.
+- Filters for category and active status.
+- Featured, trending, best-seller, and new-arrival filters.
+- Sort by name, price, stock, and date.
+- Pagination.
+- Product thumbnail.
+- Product name and SKU.
+- Category.
+- Price and sale price.
+- Stock quantity.
+- Status.
+- Edit, archive, and delete actions.
+
+Use confirmation dialogs for destructive actions.
+
+### Add and edit product form
+
+Include:
+
+- Product name.
+- SKU.
+- Full description.
+- Short description.
+- Regular price.
+- Optional sale price.
+- Stock quantity.
+- Category selector.
+- Multiple image uploads.
+- Image preview, removal, and replacement.
+- Active/inactive switch.
+- Featured switch.
+- Best-seller switch.
+- Trending switch.
+- New-arrival switch.
+
+Disable repeated submissions while saving. Show field-level validation and success or failure notifications.
+
+Do not clear the form if saving fails.
+
+### Product deletion
+
+Prefer soft deletion or archiving by default.
+
+Before deletion:
+
+1. Check whether the product appears in pending or existing orders.
+2. Preserve historical order line-item snapshots.
+3. Confirm the administrator's intention.
+4. Archive the product or apply the existing deletion policy.
+5. Clean up unused images only after confirming they are not referenced by other records.
+
+Never silently remove products from historical orders.
+
+## 11. Order Management
+
+Build a complete admin order-management page.
+
+### Order list
+
+Display:
+
+- Order number.
+- Order date.
+- Customer name.
+- Phone number.
+- Total amount.
+- Payment method.
+- Payment status.
+- Fulfillment status.
+- Order status.
+- Actions.
+
+Provide search by order number, customer name, or phone number; filters for order status, payment status, and date range; and pagination.
+
+### Order details
+
+Show:
+
+- Order number.
+- Customer contact information.
+- Shipping address.
+- Products, images, SKUs, quantities, and prices at purchase time.
+- Item subtotal.
+- Shipping fee.
+- Discount.
+- Final total.
+- Payment method and payment status.
+- Customer notes.
+- Order status history.
+- Tracking information where available.
+
+Never recalculate historical order totals from current product prices.
+
+### Order status lifecycle
+
+Support these statuses, adapting them to the existing model:
+
+- `pending`
+- `confirmed`
+- `processing`
+- `shipped`
+- `delivered`
+- `cancelled`
+
+If the existing project uses a different set of status names, preserve its API contract and map the UI correctly.
+
+Validate allowed status transitions on the backend.
+
+Record every status change with the administrator ID, timestamp, previous status, new status, and optional note.
+
+### Cash on delivery
+
+The store currently uses:
+
+```env
+COD_ENABLED=true
+DEFAULT_SHIPPING_FEE=0
+```
+
+Support cash-on-delivery orders if enabled. Do not mark COD orders as paid until payment is actually collected and verified.
+
+Use separate order status and payment status fields.
+
+Prevent duplicate orders and duplicate stock deductions on retries. Use transactions or atomic conditional updates supported by the verified database.
+
+When an order is cancelled, restore stock only if the inventory was previously deducted, and do not restore it more than once.
+
+Do not implement fake payment confirmation or assume an external payment gateway exists.
+
+## 12. Secure Admin Authentication
+
+Integrate with the existing Firebase Email/Password admin authentication.
+
+The backend must:
+
+- Verify Firebase ID tokens using the appropriate trusted verification SDK.
+- Validate administrator authorization using `ADMIN_UIDS` or the project's established role system.
+- Deny privileged actions when the token is missing, expired, invalid, or belongs to a non-admin user.
+- Apply authorization to every admin API endpoint, not just the frontend route.
+- Never accept a client-provided `isAdmin: true` flag as proof of authorization.
+
+The frontend should redirect unauthenticated users to the existing admin login page and handle expired sessions cleanly.
+
+Do not introduce a demo-login bypass.
+
+## 13. Storefront Integration
+
+Connect the customer-facing storefront to the same product data used by the admin dashboard.
+
+Ensure that:
+
+- Product cards use real Cloudinary images.
+- Product details load from the backend.
+- Categories and filters use real database data.
+- Featured products display according to `isFeatured`.
+- Best sellers display according to `isBestSeller`.
+- Trending products display according to `isTrending`.
+- New arrivals display according to `isNewArrival`.
+- Inactive and out-of-stock products are handled according to the existing storefront rules.
+- Prices, sale prices, and stock are consistent with the backend.
+- Customers can place orders without creating an account.
+
+Never let the client set trusted prices, discounts, shipping charges, or order totals without server-side validation.
+
+## 14. Reliability and Security
+
+Implement:
+
+- Server-side input validation.
+- Consistent API error responses.
+- Authentication and authorization middleware.
+- Request size limits.
+- Rate limiting for sensitive endpoints.
+- Secure CORS configuration.
+- Safe logging without credentials or sensitive customer information.
+- Pagination limits.
+- SKU uniqueness and duplicate-import protection.
+- Database indexes for product searches and order lookups.
+- Transactional or atomic stock updates where supported.
+- Image upload validation and file-size limits.
+- Appropriate secrets management.
+- Graceful handling of network failures.
+- Loading, empty, error, and success states throughout the UI.
+
+Do not trust data from the browser merely because it came from the admin panel.
+
+## 15. Testing Requirements
+
+Add or update tests for:
+
+- Admin login and authorization.
+- Creating a product.
+- Updating product information.
+- Duplicate SKU handling.
+- Product archiving.
+- Image upload signature generation.
+- Failed image upload.
+- Invalid prices and stock values.
+- Product import idempotency.
+- Order creation.
+- Order status transitions.
+- COD payment status.
+- Stock deduction and restoration.
+- Unauthorized admin requests.
+- Product visibility in the storefront.
+
+Use the real database only in a deliberately configured test environment. Never run destructive tests against production data.
+
+## 16. Implementation Workflow
+
+Follow this order:
+
+1. Inspect the repository and report the existing architecture.
+2. Identify and verify the database provider.
+3. Inspect current product, category, order, authentication, and Cloudinary implementations.
+4. Identify missing features and compatibility issues.
+5. Implement or repair the database connection and models.
+6. Implement Cloudinary upload handling securely.
+7. Implement the idempotent seed/import process for the 16 products.
+8. Implement product and category APIs.
+9. Implement order APIs and stock consistency.
+10. Integrate the APIs into the admin dashboard.
+11. Integrate the storefront with the same data.
+12. Add validation, error handling, and security rules.
+13. Run available tests, linting, type checks, and build commands.
+14. Verify the database records and Cloudinary URLs.
+15. Provide a final implementation report.
+
+Do not stop after writing a plan. Make the actual code changes supported by the available project tools.
+
+If credentials or external service access are unavailable, implement the code and report exactly which external verification remains blocked.
+
+## 17. Final Acceptance Criteria
+
+The task is complete only when:
+
+- The existing project still builds.
+- Admin authentication works without a demo bypass.
+- Product listing uses real backend data.
+- All 16 seed products are imported or an explicit database blocker is reported.
+- Existing Cloudinary image URLs are preserved and verified.
+- New product images can be uploaded and associated with database records.
+- Products can be edited and safely archived or deleted.
+- Inventory updates persist correctly.
+- Orders can be searched, viewed, and managed.
+- Order status changes are validated and audited.
+- COD payment handling is accurate.
+- The customer storefront uses the same real product data.
+- Errors are visible and actionable.
+- No privileged secrets are exposed in the frontend.
+- Tests and build results are reported honestly.
+
+At the end, summarize:
+
+1. Files created and modified.
+2. Database provider and connection method.
+3. APIs implemented.
+4. Admin features completed.
+5. Number of products actually imported.
+6. Image upload and verification results.
+7. Tests and build results.
+8. Remaining configuration or credential requirements.
+
+**Important: Do not claim any database writes, uploads, or tests succeeded unless you actually executed and verified them.**
