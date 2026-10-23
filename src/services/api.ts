@@ -811,5 +811,25 @@ export const api = {
     } catch {
       return { success: true };
     }
+  },
+
+  getGeminiStatus: async (test = false): Promise<{ status: { configured: boolean; model: string; keySource: string; status: string; message: string } }> => {
+    return httpRequest<any>(`/api/admin/gemini/status?test=${test}`, {
+      method: 'GET',
+      requiresAuth: true
+    });
+  },
+
+  generateProductCopy: async (payload: {
+    productName: string;
+    category?: string;
+    keywords?: string;
+    tone?: string;
+  }): Promise<{ success: boolean; content: { name: string; shortDescription: string; description: string; highlights: string[]; suggestedTags: string[] } }> => {
+    return httpRequest<any>('/api/admin/gemini/generate-copy', {
+      method: 'POST',
+      body: payload,
+      requiresAuth: true
+    });
   }
 };

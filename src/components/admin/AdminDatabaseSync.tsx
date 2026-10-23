@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Database, Cloud, RefreshCw, CheckCircle2, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
+import { Database, Cloud, RefreshCw, CheckCircle2, AlertTriangle, ShieldCheck, Activity, Sparkles } from 'lucide-react';
 import { api, getApiBaseUrl } from '../../services/api.ts';
 import { auth } from '../../services/firebase.ts';
 
@@ -7,18 +7,21 @@ export const AdminDatabaseSync: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [livenessStatus, setLivenessStatus] = useState<any>(null);
   const [readinessStatus, setReadinessStatus] = useState<any>(null);
+  const [geminiStatus, setGeminiStatus] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const checkStatus = async () => {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const [live, ready] = await Promise.all([
+      const [live, ready, gemini] = await Promise.all([
         api.checkLiveness().catch(err => ({ status: 'error', message: err.message })),
-        api.checkReadiness().catch(err => ({ status: 'error', message: err.message }))
+        api.checkReadiness().catch(err => ({ status: 'error', message: err.message })),
+        api.getGeminiStatus(false).catch(err => ({ status: { configured: false, message: err.message } }))
       ]);
       setLivenessStatus(live);
       setReadinessStatus(ready);
+      setGeminiStatus(gemini?.status || null);
     } catch (err: any) {
       setErrorMessage(err.message || 'Health check failed');
     } finally {
@@ -60,7 +63,7 @@ export const AdminDatabaseSync: React.FC = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
         {/* Backend API Liveness */}
         <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 space-y-1.5">
           <div className="flex items-center justify-between">
@@ -121,6 +124,27 @@ export const AdminDatabaseSync: React.FC = () => {
           </div>
           <p className="text-[11px] text-slate-500 truncate" title={currentUser?.email || ''}>
             User: {currentUser?.email || 'None'}
+          </p>
+        </div>
+
+        {/* Google Gemini AI Status */}
+        <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-purple-600" /> Gemini AI
+            </span>
+            {geminiStatus?.configured ? (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Configured
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
+                Not Set
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-slate-500 truncate" title={geminiStatus?.message || 'Gemini 3.8 Flash'}>
+            Model: <span className="font-mono font-medium text-slate-700">gemini-3.8-flash</span>
           </p>
         </div>
       </div>

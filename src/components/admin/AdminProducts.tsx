@@ -73,6 +73,35 @@ export const AdminProducts: React.FC = () => {
   // Image uploader state
   const [formImages, setFormImages] = useState<UploadedImageItem[]>([]);
   const [deletedPublicIds, setDeletedPublicIds] = useState<string[]>([]);
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+
+  const handleAiGenerateCopy = async () => {
+    if (!formData.name.trim()) {
+      showToast('Please enter a product name first before generating with AI', 'error');
+      return;
+    }
+    setIsAiGenerating(true);
+    try {
+      const selectedCategory = categories.find(c => c.id === formData.categoryId)?.name;
+      const res = await api.generateProductCopy({
+        productName: formData.name.trim(),
+        category: selectedCategory,
+        keywords: formData.shortDescription || undefined
+      });
+      if (res.success && res.content) {
+        setFormData(prev => ({
+          ...prev,
+          shortDescription: res.content.shortDescription || prev.shortDescription,
+          description: res.content.description || prev.description
+        }));
+        showToast('Generated product description & highlights with Gemini AI!', 'success');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'AI copy generation failed. Check your Gemini API key in .env', 'error');
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -1263,9 +1292,21 @@ export const AdminProducts: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-800 mb-1">
-                  Full Product Description
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-800">
+                    Full Product Description
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAiGenerateCopy}
+                    disabled={isAiGenerating}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100/90 active:bg-amber-200 border border-amber-200/80 rounded-lg transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+                    title="Generate description & highlights using Gemini 3.8 Flash AI"
+                  >
+                    <Sparkles className={`w-3.5 h-3.5 ${isAiGenerating ? 'animate-spin text-amber-600' : 'text-amber-600'}`} />
+                    <span>{isAiGenerating ? 'Generating with Gemini...' : '✨ AI Generate with Gemini'}</span>
+                  </button>
+                </div>
                 <textarea
                   rows={3}
                   value={formData.description}

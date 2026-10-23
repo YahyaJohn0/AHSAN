@@ -3,6 +3,7 @@ import { ShoppingBag, Heart, Search, PackageCheck, X, User } from 'lucide-react'
 import { useStore } from '../context/StoreContext.tsx';
 
 import appLogo from '../assets/images/AppLogo.jpeg';
+import { PWAInstallButton } from './PWAInstallButton';
 
 export const Header: React.FC = () => {
   const {
@@ -167,6 +168,9 @@ export const Header: React.FC = () => {
               <span>Sign In</span>
             </button>
           )}
+
+          {/* Dedicated Window / PWA Installer Button */}
+          <PWAInstallButton />
         </div>
       </div>
 

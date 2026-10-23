@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -28,6 +29,7 @@ import {
   getMongoOrderByIdOrNumber,
   seedMongoProducts
 } from './server/mongo.ts';
+import { checkGeminiStatus, generateProductContent } from './server/gemini.ts';
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -839,6 +841,34 @@ app.post('/api/admin/change-password', requireAdminAuth, (req: Request, res: Res
   }
 
   res.json({ success: true, message: 'Password updated successfully' });
+});
+
+// Google Gemini Generative AI Endpoints (Admin & Catalog Assistant)
+app.get('/api/admin/gemini/status', requireAdminAuth, async (req: Request, res: Response) => {
+  const testPing = req.query.test === 'true';
+  const status = await checkGeminiStatus(testPing);
+  res.json({ status });
+});
+
+app.post('/api/admin/gemini/generate-copy', requireAdminAuth, async (req: Request, res: Response) => {
+  try {
+    const { productName, category, keywords, tone } = req.body;
+    if (!productName || typeof productName !== 'string' || !productName.trim()) {
+      return res.status(400).json({ error: 'productName is required' });
+    }
+
+    const content = await generateProductContent({
+      productName: productName.trim(),
+      category: category ? String(category).trim() : undefined,
+      keywords: keywords ? String(keywords).trim() : undefined,
+      tone: tone ? String(tone).trim() : undefined,
+    });
+
+    res.json({ success: true, content });
+  } catch (err: any) {
+    console.error('[Gemini Generate Copy Error]', err.message);
+    res.status(500).json({ success: false, error: err.message || 'Failed to generate product content with Gemini' });
+  }
 });
 
 // ==========================================
