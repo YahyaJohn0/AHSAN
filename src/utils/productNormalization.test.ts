@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeProductRecord } from '../services/rtdb.ts';
+import { normalizeProductRecord } from './productNormalization.ts';
 
 test('normalizeProductRecord handles empty or null payload safely', () => {
   const product = normalizeProductRecord('test-id-1', null);

@@ -13,7 +13,6 @@ import {
   updateProfile,
   type User
 } from 'firebase/auth';
-import { getDatabase, Database } from 'firebase/database';
 
 const env: Record<string, string | undefined> =
   typeof import.meta !== 'undefined' && (import.meta as any).env
@@ -29,10 +28,6 @@ const firebaseConfig = {
     env.VITE_FIREBASE_AUTH_DOMAIN ||
     env.FIREBASE_AUTH_DOMAIN ||
     'mobapp-4454b.firebaseapp.com',
-  databaseURL:
-    env.VITE_FIREBASE_DATABASE_URL ||
-    env.FIREBASE_DATABASE_URL ||
-    'https://mobapp-4454b-default-rtdb.asia-southeast1.firebasedatabase.app',
   projectId:
     env.VITE_FIREBASE_PROJECT_ID ||
     env.FIREBASE_PROJECT_ID ||
@@ -43,9 +38,9 @@ const firebaseConfig = {
     ''
 };
 
+// Initialize Firebase App strictly for Authentication
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const rtdb: Database = getDatabase(app);
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });

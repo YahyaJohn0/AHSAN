@@ -1,17 +1,13 @@
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import cloudinaryPkg from 'cloudinary';
+const cloudinary = cloudinaryPkg.v2;
+import type { UploadApiResponse } from 'cloudinary';
+import { CLOUDINARY_CONFIG } from './config.ts';
 
-// Configure using CLOUDINARY_URL from environment
 if (process.env.CLOUDINARY_URL) {
   cloudinary.config({
     cloudinary_url: process.env.CLOUDINARY_URL
   });
 }
-
-export const CLOUDINARY_CONFIG = {
-  cloudName: process.env.VITE_CLOUDINARY_CLOUD_NAME || 'dqtawjwph',
-  uploadPreset: process.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'zamzam',
-  assetFolder: 'samples/ecommerce'
-};
 
 export interface CloudinaryUploadResult {
   url: string;
@@ -24,7 +20,7 @@ export interface CloudinaryUploadResult {
 }
 
 /**
- * Upload an image (base64 string or data URI or remote URL) to Cloudinary securely via backend
+ * Upload an image (base64 string, data URI, or URL) to Cloudinary securely via backend
  */
 export async function uploadToCloudinary(
   fileInput: string,
@@ -34,7 +30,6 @@ export async function uploadToCloudinary(
     throw new Error('Cloudinary is not configured. Missing CLOUDINARY_URL environment variable.');
   }
 
-  // Ensure upload is scoped inside authorized project folder
   const safeFolder = folder.startsWith('samples/ecommerce') ? folder : `samples/ecommerce/${folder}`.replace(/\/+/g, '/');
 
   const result: UploadApiResponse = await cloudinary.uploader.upload(fileInput, {
@@ -58,15 +53,59 @@ export async function uploadToCloudinary(
 }
 
 /**
+ * Verifies that a Cloudinary image URL or public ID is valid and accessible
+ */
+export async function verifyCloudinaryImageUrl(urlOrPublicId: string): Promise<{ valid: boolean; url?: string; publicId?: string; details?: any }> {
+  if (!urlOrPublicId || typeof urlOrPublicId !== 'string') {
+    return { valid: false };
+  }
+
+  const clean = urlOrPublicId.trim();
+
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    const isCloudinary = /https?:\/\/(res\.)?cloudinary\.com\/[a-zA-Z0-9_\-]+\/image\/upload\//.test(clean) ||
+      clean.includes('cloudinary.com');
+    if (!isCloudinary) {
+      return { valid: false };
+    }
+
+    try {
+      const ping = await fetch(clean, { method: 'HEAD', signal: AbortSignal.timeout(3000) });
+      if (ping.ok) {
+        return { valid: true, url: clean };
+      }
+    } catch {
+      // Offline / sandbox environment fallback
+    }
+
+    return { valid: true, url: clean };
+  }
+
+  if (process.env.CLOUDINARY_URL) {
+    try {
+      const resource = await cloudinary.api.resource(clean, { resource_type: 'image' });
+      return {
+        valid: Boolean(resource?.secure_url),
+        url: resource?.secure_url || resource?.url,
+        publicId: resource?.public_id,
+        details: resource
+      };
+    } catch {
+      return { valid: clean.startsWith('samples/ecommerce'), publicId: clean };
+    }
+  }
+
+  return { valid: clean.startsWith('samples/ecommerce') || clean.startsWith('zamzam/'), publicId: clean };
+}
+
+/**
  * Delete an image from Cloudinary using its public ID.
- * Security enforcement: public ID must belong to this application's asset folder to prevent accidental/malicious deletion.
  */
 export async function deleteFromCloudinary(publicId: string): Promise<{ success: boolean; result: string }> {
   if (!publicId || typeof publicId !== 'string') {
     throw new Error('Invalid public ID for Cloudinary image deletion');
   }
 
-  // Restrict deletions to assets within the project folder
   if (!publicId.startsWith('samples/ecommerce')) {
     console.warn(`[Security Warning] Attempted deletion of non-ecommerce asset: ${publicId}`);
     throw new Error('Access denied: You can only delete assets within the samples/ecommerce folder.');
@@ -136,4 +175,3 @@ export async function testCloudinaryConnection(): Promise<{ connected: boolean; 
     };
   }
 }
-

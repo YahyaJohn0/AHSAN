@@ -527,7 +527,7 @@ export const api = {
       throw new Error(data?.error?.message || `Cloudinary upload failed with HTTP status ${res.status}`);
     }
 
-    return {
+    const uploadResult = {
       url: data.url,
       secureUrl: data.secure_url || data.url,
       publicId: data.public_id,
@@ -536,6 +536,50 @@ export const api = {
       height: data.height || 800,
       bytes: data.bytes || 0
     };
+
+    // Auto-verify and persist to Firestore/MongoDB images collection
+    try {
+      await httpRequest('/api/v1/uploads/verify-and-store', {
+        method: 'POST',
+        body: uploadResult,
+        requiresAuth: true
+      });
+    } catch (storeErr) {
+      console.warn('[Auto-store image in database collection warning]', storeErr);
+    }
+
+    return uploadResult;
+  },
+
+  /**
+   * Explicitly verifies and stores a Cloudinary image URL and metadata in the database collection
+   */
+  verifyAndStoreImage: async (payload: {
+    url: string;
+    secureUrl?: string;
+    publicId?: string;
+    productId?: string;
+    format?: string;
+    width?: number;
+    height?: number;
+    bytes?: number;
+    altText?: string;
+  }): Promise<{ success: boolean; image: any }> => {
+    return httpRequest('/api/v1/uploads/verify-and-store', {
+      method: 'POST',
+      body: payload,
+      requiresAuth: true
+    });
+  },
+
+  /**
+   * Retrieves all verified Cloudinary images stored in the Firestore/MongoDB collection
+   */
+  getStoredImages: async (page = 1, limit = 50): Promise<{ images: any[]; total: number }> => {
+    return httpRequest(`/api/v1/uploads/images?page=${page}&limit=${limit}`, {
+      method: 'GET',
+      requiresAuth: true
+    });
   },
 
   deleteCloudinaryImage: async (publicId: string): Promise<{ success: boolean; result?: string }> => {

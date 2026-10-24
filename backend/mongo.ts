@@ -1,6 +1,7 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 import { SEED_16_PRODUCTS, type SeedProductInput } from './seedData.ts';
 import type { Product, Order, OrderStatus } from './db.ts';
+import { MONGO_CONFIG } from './config.ts';
 
 let client: MongoClient | null = null;
 let dbInstance: Db | null = null;
@@ -12,15 +13,32 @@ export interface MongoStatus {
   databaseName: string;
   productsCount: number;
   ordersCount: number;
+  imagesCount: number;
   host: string;
   message: string;
+}
+
+export interface StoredImageDoc {
+  id: string;
+  url: string;
+  secureUrl: string;
+  publicId: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  bytes?: number;
+  uploadedAt: string;
+  associatedProductId?: string;
+  altText?: string;
+  source: 'cloudinary';
+  verified: boolean;
 }
 
 /**
  * Retrieves the MongoDB-compatible Firestore URI from environment
  */
 export function getMongoUri(): string | null {
-  return process.env.FIRESTORE_URL || process.env.MONGO_URL || null;
+  return MONGO_CONFIG.uri;
 }
 
 /**
@@ -45,8 +63,8 @@ export async function getMongoDb(): Promise<Db | null> {
 
     await client.connect();
     isConnected = true;
-    dbInstance = client.db('default');
-    console.log('[MongoDB] Connected to database: default');
+    dbInstance = client.db(MONGO_CONFIG.dbName);
+    console.log(`[MongoDB] Connected to database: ${MONGO_CONFIG.dbName}`);
     return dbInstance;
   } catch (err: any) {
     isConnected = false;
@@ -67,6 +85,7 @@ export async function checkMongoStatus(): Promise<MongoStatus> {
       databaseName: 'none',
       productsCount: 0,
       ordersCount: 0,
+      imagesCount: 0,
       host: 'none',
       message: 'No FIRESTORE_URL or MONGO_URL configured in environment'
     };
@@ -86,40 +105,167 @@ export async function checkMongoStatus(): Promise<MongoStatus> {
       return {
         configured: true,
         connected: false,
-        databaseName: 'default',
+        databaseName: MONGO_CONFIG.dbName,
         productsCount: 0,
         ordersCount: 0,
+        imagesCount: 0,
         host,
         message: 'Could not establish connection to MongoDB service'
       };
     }
 
-    const [productsCount, ordersCount] = await Promise.all([
+    const [productsCount, ordersCount, imagesCount] = await Promise.all([
       db.collection<any>('products').countDocuments().catch(() => 0),
-      db.collection<any>('orders').countDocuments().catch(() => 0)
+      db.collection<any>('orders').countDocuments().catch(() => 0),
+      db.collection<any>('images').countDocuments().catch(() => 0)
     ]);
 
     return {
       configured: true,
       connected: true,
-      databaseName: 'default',
+      databaseName: MONGO_CONFIG.dbName,
       productsCount,
       ordersCount,
+      imagesCount,
       host,
-      message: `Connected successfully to Firestore MongoDB API (${productsCount} products, ${ordersCount} orders)`
+      message: `Connected successfully to Firestore MongoDB API (${productsCount} products, ${ordersCount} orders, ${imagesCount} images)`
     };
   } catch (err: any) {
     return {
       configured: true,
       connected: false,
-      databaseName: 'default',
+      databaseName: MONGO_CONFIG.dbName,
       productsCount: 0,
       ordersCount: 0,
+      imagesCount: 0,
       host,
       message: err.message || 'Connection check failed'
     };
   }
 }
+
+// ==========================================
+// IMAGE COLLECTION PERSISTENCE (CLOUDINARY -> FIRESTORE/MONGO)
+// ==========================================
+
+/**
+ * Stores a verified Cloudinary image document in the Firestore/MongoDB images collection
+ */
+export async function storeMongoImage(imageInput: {
+  url: string;
+  secureUrl?: string;
+  publicId?: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  bytes?: number;
+  associatedProductId?: string;
+  altText?: string;
+}): Promise<StoredImageDoc | null> {
+  const db = await getMongoDb();
+  const now = new Date().toISOString();
+  const publicId = imageInput.publicId || `samples/ecommerce/img-${Date.now()}`;
+  const id = publicId.replace(/\//g, '_');
+  const secureUrl = imageInput.secureUrl || imageInput.url;
+
+  const doc: StoredImageDoc = {
+    id,
+    url: imageInput.url,
+    secureUrl,
+    publicId,
+    format: imageInput.format,
+    width: imageInput.width,
+    height: imageInput.height,
+    bytes: imageInput.bytes,
+    uploadedAt: now,
+    associatedProductId: imageInput.associatedProductId,
+    altText: imageInput.altText,
+    source: 'cloudinary',
+    verified: true
+  };
+
+  if (!db) {
+    return doc;
+  }
+
+  try {
+    await db.collection<any>('images').updateOne(
+      { $or: [{ id }, { publicId }, { secureUrl }] },
+      { $set: { ...doc, _id: id } },
+      { upsert: true }
+    );
+    return doc;
+  } catch (err: any) {
+    console.warn('[MongoDB Image Store Warning]', err.message);
+    return doc;
+  }
+}
+
+/**
+ * Retrieves all stored Cloudinary images from the Firestore/MongoDB images collection
+ */
+export async function getMongoImages(options: { page?: number; limit?: number } = {}): Promise<{ images: StoredImageDoc[]; total: number }> {
+  const db = await getMongoDb();
+  if (!db) return { images: [], total: 0 };
+
+  try {
+    const col = db.collection<any>('images');
+    const total = await col.countDocuments();
+    const page = Math.max(1, options.page || 1);
+    const limit = Math.min(100, Math.max(1, options.limit || 50));
+    const skip = (page - 1) * limit;
+
+    const docs = await col
+      .find({})
+      .sort({ uploadedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    const images: StoredImageDoc[] = docs.map(d => ({
+      id: d.id || String(d._id),
+      url: d.url,
+      secureUrl: d.secureUrl || d.url,
+      publicId: d.publicId,
+      format: d.format,
+      width: d.width,
+      height: d.height,
+      bytes: d.bytes,
+      uploadedAt: d.uploadedAt || new Date().toISOString(),
+      associatedProductId: d.associatedProductId,
+      altText: d.altText,
+      source: 'cloudinary',
+      verified: d.verified !== undefined ? Boolean(d.verified) : true
+    }));
+
+    return { images, total };
+  } catch (err: any) {
+    console.warn('[MongoDB Get Images Warning]', err.message);
+    return { images: [], total: 0 };
+  }
+}
+
+/**
+ * Deletes an image record from the Firestore/MongoDB images collection
+ */
+export async function deleteMongoImage(publicIdOrId: string): Promise<boolean> {
+  const db = await getMongoDb();
+  if (!db) return false;
+
+  try {
+    const res = await db.collection<any>('images').deleteOne({
+      $or: [{ id: publicIdOrId }, { _id: publicIdOrId }, { publicId: publicIdOrId }]
+    });
+    return res.deletedCount > 0;
+  } catch (err: any) {
+    console.warn('[MongoDB Delete Image Warning]', err.message);
+    return false;
+  }
+}
+
+// ==========================================
+// PRODUCT CATALOG SEEDING & MANAGEMENT
+// ==========================================
 
 /**
  * Idempotently seeds the canonical 16 products using SKU as the unique business key.
@@ -192,6 +338,14 @@ export async function seedMongoProducts(
           { $set: { ...doc, _id: id } },
           { upsert: true }
         );
+
+        // Also record image in images collection
+        await storeMongoImage({
+          url: item.imageUrl,
+          secureUrl: item.imageUrl,
+          publicId: item.imagePublicId || `samples/ecommerce/${item.sku.toLowerCase()}`,
+          associatedProductId: id
+        });
       }
 
       if (existing) {
@@ -344,7 +498,7 @@ export async function getMongoProductById(idOrSku: string): Promise<Product | nu
 }
 
 /**
- * Creates or updates a product in MongoDB
+ * Creates or updates a product in MongoDB and synchronizes image assets into images collection
  */
 export async function saveMongoProduct(payload: Partial<Product> & { name: string; price: number }): Promise<Product> {
   const db = await getMongoDb();
@@ -380,6 +534,21 @@ export async function saveMongoProduct(payload: Partial<Product> & { name: strin
     { $set: { ...product, _id: id } },
     { upsert: true }
   );
+
+  // Synchronize Cloudinary images to the images collection
+  if (Array.isArray(product.images)) {
+    for (const imgUrl of product.images) {
+      if (typeof imgUrl === 'string' && imgUrl.startsWith('http')) {
+        const meta = product.imageMetadata?.find(m => m.url === imgUrl);
+        await storeMongoImage({
+          url: imgUrl,
+          secureUrl: imgUrl,
+          publicId: meta?.publicId,
+          associatedProductId: id
+        });
+      }
+    }
+  }
 
   return product;
 }
@@ -421,7 +590,6 @@ export async function createMongoOrder(order: Order): Promise<{ success: boolean
   if (!db) return { success: false, order, error: 'Database not connected' };
 
   try {
-    // 1. Check stock and deduct for each item
     for (const item of order.items) {
       const prod = await db.collection<any>('products').findOne({
         $or: [{ id: item.productId }, { _id: item.productId }]
@@ -436,7 +604,6 @@ export async function createMongoOrder(order: Order): Promise<{ success: boolean
       }
     }
 
-    // 2. Deduct inventory
     for (const item of order.items) {
       await db.collection<any>('products').updateOne(
         { $or: [{ id: item.productId }, { _id: item.productId }] },
@@ -444,7 +611,6 @@ export async function createMongoOrder(order: Order): Promise<{ success: boolean
       );
     }
 
-    // 3. Save order
     await db.collection<any>('orders').insertOne({ ...order, _id: order.id });
 
     return { success: true, order };
@@ -540,7 +706,6 @@ export async function updateMongoOrderStatus(
   const now = new Date().toISOString();
   const prevStatus = existing.fulfillmentStatus;
 
-  // If newly cancelled and not previously cancelled, restore inventory
   if (newStatus === 'cancelled' && prevStatus !== 'cancelled' && Array.isArray(existing.items)) {
     for (const item of existing.items) {
       await db.collection<any>('products').updateOne(
@@ -595,7 +760,6 @@ export async function getMongoOrderByIdOrNumber(
   const d = await db.collection<any>('orders').findOne(query);
   if (!d) return null;
 
-  // If phone validation is requested, compare numbers
   if (phone && d.customer?.phone) {
     const cleanReq = phone.replace(/\D/g, '');
     const cleanCust = d.customer.phone.replace(/\D/g, '');
